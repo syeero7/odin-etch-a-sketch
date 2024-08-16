@@ -15,7 +15,19 @@ const genNewGrid = () => {
 const changeBGColor = () => {
   container.querySelectorAll("div").forEach((div) => {
     div.addEventListener("mouseover", () => {
-      div.style.backgroundColor = "#000";
+      const bgColorValue =
+        getComputedStyle(div).getPropertyValue("background-color");
+      const rgba = bgColorValue.match(/[\d.]+/g);
+
+      if (rgba.length === 4) {
+        rgba[3] = Math.min(1, Math.max(0, parseFloat(rgba[3])));
+
+        if (rgba[3] <= 1) {
+          rgba[3] += 0.1;
+        }
+
+        div.style.backgroundColor = `rgba(0, 0, 0, ${rgba[3]})`;
+      }
     });
   });
 };
