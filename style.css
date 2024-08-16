@@ -19,7 +19,6 @@
 
 .container div {
   flex: 1 1;
-  flex-basis: 6.25%;
   border: var(--border);
   background-color: #fff;
 }
@@ -28,7 +27,7 @@ main {
   padding: 0.8rem;
   border: var(--border);
   width: fit-content;
-  margin:1rem auto;
+  margin: 1rem auto;
   background-color: #333;
 }
 
