@@ -15,12 +15,13 @@
   width: 50rem;
   height: 50rem;
   border: var(--border);
+  background-color: #fff;
 }
 
 .container div {
   flex: 1 1;
   border: var(--border);
-  background-color: #fff;
+  background-color: rgba(0, 0, 0, 0);
 }
 
 main {
