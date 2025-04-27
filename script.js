@@ -1,65 +1,70 @@
 const container = document.querySelector(".container");
-const btn = document.querySelector("button");
+const button = document.querySelector("button");
 
+const MAX_GRID_ITEMS = 100;
 let userInput = 64;
-let promptInput = "64";
 
-const genNewGrid = () => {
-  userInput = parseInt(promptInput, 10);
+container.addEventListener("mouseover", changeBGColor);
+button.addEventListener("click", refreshDisplay);
+
+function createNewGrid() {
+  const fragment = document.createDocumentFragment();
+
   for (let i = 0; i < userInput * userInput; i++) {
     const div = document.createElement("div");
-    container.appendChild(div);
+    div.style.flexBasis = `${MAX_GRID_ITEMS / userInput}%`;
+    div.dataset.empty = true;
+    div.dataset.colored = false;
+    div.classList.add("grid-item");
+    fragment.appendChild(div);
   }
-};
 
-const changeBGColor = () => {
-  container.querySelectorAll("div").forEach((div) => {
-    div.addEventListener("mouseover", () => {
-      const bgColorValue =
-        getComputedStyle(div).getPropertyValue("background-color");
-      const rgba = bgColorValue.match(/[\d.]+/g);
+  container.appendChild(fragment);
+}
 
-      if (rgba.length === 4) {
-        rgba[3] = Math.min(1, Math.max(0, parseFloat(rgba[3])));
+function changeBGColor(e) {
+  const target = e.target;
+  if (target.className !== "grid-item") return;
+  if (target.dataset.colored === "true") return;
+  const bgColor = getComputedStyle(target).backgroundColor;
 
-        if (rgba[3] <= 1) {
-          rgba[3] += 0.1;
-        }
+  if (target.dataset.empty === "false") {
+    const rgba = bgColor.split(",");
+    const opacity = Number(rgba[3].replace(")", "").trim());
+    if (opacity + 0.1 === 1) target.dataset.colored = true;
 
-        div.style.backgroundColor = `rgba(0, 0, 0, ${rgba[3]})`;
-      }
-    });
-  });
-};
-
-const getUserInput = () => {
-  promptInput = prompt("How many squares do you want per side?\n(1-101)", "64");
-
-  while (
-    promptInput <= 1 ||
-    promptInput > 100 ||
-    !/^[0-9]+$/.test(promptInput)
-  ) {
-    alert("Please enter a number between 1 and 101");
-    promptInput = prompt("How many squares do you want per side?", "64");
+    rgba[3] = `${opacity + 0.1})`;
+    target.style.backgroundColor = rgba.join(",");
+    return;
   }
-};
 
-const adjustNewGrid = () => {
-  const newFlexBasis = 100 / userInput;
-  container.querySelectorAll("div").forEach((div) => {
-    div.style.flexBasis = `${newFlexBasis}%`;
-  });
-};
+  const r = Math.floor(Math.random() * 255);
+  const g = Math.floor(Math.random() * 255);
+  const b = Math.floor(Math.random() * 255);
 
-btn.addEventListener("click", () => {
+  target.style.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.1)`;
+  target.dataset.empty = false;
+}
+
+function getUserInput() {
+  const input = Number(
+    prompt(`How many squares do you want per side?\n max: ${MAX_GRID_ITEMS}`, "64")
+  );
+
+  if (input < 1 || input > MAX_GRID_ITEMS) {
+    alert(`Please enter a number between 1 & ${MAX_GRID_ITEMS}`);
+    return;
+  }
+
+  userInput = input;
+}
+
+function refreshDisplay() {
   getUserInput();
   removeCurrentGrid();
-  genNewGrid();
-  adjustNewGrid();
-  changeBGColor();
-  changeButtonText();
-});
+  createNewGrid();
+  button.textContent = `${userInput}x${userInput}`;
+}
 
 function removeCurrentGrid() {
   while (container.firstChild) {
@@ -67,10 +72,4 @@ function removeCurrentGrid() {
   }
 }
 
-function changeButtonText() {
-  btn.textContent = `${userInput}x${userInput}`;
-}
-
-genNewGrid();
-adjustNewGrid();
-changeBGColor();
+createNewGrid();
